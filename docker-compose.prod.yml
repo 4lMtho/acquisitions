@@ -1,0 +1,13 @@
+name: acquisitions-prod
+
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    container_name: acquisitions-app
+    env_file:
+      - .env.production
+    ports:
+      - "3000:3000"
+    # No Neon Local in production; app connects directly to Neon Cloud via DATABASE_URL

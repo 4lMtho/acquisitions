@@ -1,0 +1,27 @@
+# Docker
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store
+
+# Build output
+coverage
+build
+dist
+
+# Local env files
+.env
+.env.*
+
+# VCS/IDE
+.git
+.gitignore
+.idea
+.vscode
+
+# Docker artifacts
+.docker
+
+# Neon Local metadata (if you enable persistence)
+.neon_local
