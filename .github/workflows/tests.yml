@@ -1,0 +1,75 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main, staging ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      NODE_OPTIONS: --experimental-vm-modules
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: |
+          set -o pipefail
+          npm test -- --coverage | tee test-output.txt
+
+      - name: Upload coverage and logs artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-and-logs
+          path: |
+            coverage/**
+            test-output.txt
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Test summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            LINES=$(jq -r '.total.lines.pct // empty' coverage/coverage-summary.json || true)
+            STATEMENTS=$(jq -r '.total.statements.pct // empty' coverage/coverage-summary.json || true)
+            BRANCHES=$(jq -r '.total.branches.pct // empty' coverage/coverage-summary.json || true)
+            FUNCTIONS=$(jq -r '.total.functions.pct // empty' coverage/coverage-summary.json || true)
+          fi
+
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ Tests passed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ Tests failed" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::One or more tests failed. See job logs and the uploaded test-output.txt artifact for details." 
+          fi
+
+          if [ -n "$LINES" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Coverage:" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Lines: $LINES%" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Statements: $STATEMENTS%" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Branches: $BRANCHES%" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Functions: $FUNCTIONS%" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Coverage report not found. Ensure Jest is configured with --coverage or coverage reporters." >> "$GITHUB_STEP_SUMMARY"
+          fi
