@@ -123,4 +123,4 @@ The prod Compose file does not run Neon Local; the app connects directly to Neon
 
 ## References
 
-- Neon Local docs: https://neon.com/docs/local/neon-local
+- Neon Local docs: https://neon.com/docs/local/neon-local.
