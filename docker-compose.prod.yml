@@ -9,5 +9,5 @@ services:
     env_file:
       - .env.production
     ports:
-      - "3000:3000"
+      - '3000:3000'
     # No Neon Local in production; app connects directly to Neon Cloud via DATABASE_URL

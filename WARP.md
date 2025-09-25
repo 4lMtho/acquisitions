@@ -3,18 +3,20 @@
 This file provides guidance to WARP (warp.dev) when working with code in this repository.
 
 Project overview
+
 - Stack: Node.js (ESM) + Express 5, Drizzle ORM (neon-http), Neon serverless Postgres, Winston logging, Morgan HTTP logging, Zod validation, Arcjet security middleware.
 - Entrypoint: src/index.js → src/server.js (listen) → src/app.js (Express app, middleware, routes).
 - Routes: /api/auth (sign-up, sign-in, sign-out), /api/users (list, by id placeholder). Health at /health and root at /.
-- Import aliases: package.json defines import maps for #config/*, #controllers/*, #middleware/*, #models/*, #routes/*, #services/*, #utils/*, #validations/*.
+- Import aliases: package.json defines import maps for #config/_, #controllers/_, #middleware/_, #models/_, #routes/_, #services/_, #utils/_, #validations/_.
 - Environment: NODE_ENV toggles Neon Local dev behavior; Docker Compose orchestrates dev (with Neon Local proxy) and prod (direct Neon Cloud).
 
 Common commands
+
 - Install
   - npm ci (preferred, lockfile present)
   - npm install
 - Run (local without Docker)
-  - npm run dev  # node --watch src/index.js
+  - npm run dev # node --watch src/index.js
 - Lint/Format
   - npm run lint
   - npm run lint:fix
@@ -36,6 +38,7 @@ Common commands
 - Tests: No test runner or scripts are configured in this repo as of now. Update this section when tests are added.
 
 High-level architecture
+
 - Bootstrap
   - src/index.js loads dotenv and imports ./server.js
   - src/server.js reads PORT (default 3000) and starts Express app
@@ -65,6 +68,7 @@ High-level architecture
   - validations/auth.validation.js: Zod schemas for signup/signin
 
 Environment and runtime
+
 - Required variables commonly used by the app and tooling (set via env files or CI):
   - DATABASE_URL (dev/prod; Neon Local vs Neon Cloud)
   - NODE_ENV (development/production)
@@ -79,10 +83,12 @@ Environment and runtime
   - GET /health returns JSON with status, timestamp, and uptime; Dockerfile healthcheck targets this endpoint
 
 Key notes distilled from README
+
 - Dev uses Neon Local proxy with ephemeral branches; stopping dev removes ephemeral branch
 - For serverless driver in dev, Neon Local proxy is at http://neon-local:5432/sql with self-signed TLS (adjust ssl behavior in non-serverless clients)
 - Production connects directly to Neon Cloud via DATABASE_URL; no Neon Local
 
 Conventions
+
 - Code style: ESLint (eslint.config.js) with Prettier integration; ESM modules; 2-space indentation; single quotes; semicolons
 - Import aliases via package.json "imports" map (ESM import maps); use paths like import x from '#services/...'
